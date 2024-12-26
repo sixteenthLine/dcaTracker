@@ -9,7 +9,7 @@ nest_asyncio.apply()
 memory = []
 API_ID = '20077498'
 API_HASH = 'b3433fe5fc1ad2135a288a42eb5aabad'
-sender = -1002462696731
+sender = -1002306843892
 reciever = -1002462696731
 
 
@@ -47,7 +47,7 @@ def handle_reply(event):
     
 async def main():
     await client.start()  
-    print("Бот запущен и ждет новые сообщения...")
+    await client.send_message(reciever, "Bot запущен")
     await client.run_until_disconnected()  
 
 asyncio.run(main())
