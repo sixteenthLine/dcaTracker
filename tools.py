@@ -3,7 +3,10 @@ import time
 class Tools:
     @staticmethod
     def getAmout(message):
-        return int(message.split(" ")[0][1:-1].split(".")[0])
+        msg = message.split(" ")[0]
+        if "M" in msg:
+            return 1000
+        return int(msg[1:-1].split(".")[0])
     
     @staticmethod
     def getDirection(message):
@@ -11,7 +14,7 @@ class Tools:
         
     @staticmethod   
     def getPercentages(message):
-        percentages = float(message.split("Potential price change: ")[1].split("%")[0])
+        percentages = float(message.split("%")[0].split(" ")[-1])
         return percentages
     
     @staticmethod
@@ -23,19 +26,20 @@ class Tools:
 
     @staticmethod
     def idGoodTime(message):
-        try:
-            if "hour" in message:
-                hours = int(message.split(" hours")[0].split(" ")[1])
-                return hours < 2
-            else:
-                return True
-        except (IndexError, ValueError):
-            return False
-    
+        if "hour" in message.split("%")[0]:
+            hours = int(message.split(" hour")[0].split(" ")[1])
+            return hours < 2
+        else:
+            return True
+
+    @staticmethod 
+    def has_mexc(message):
+        return "MEXC" in message
+
     @staticmethod
     def isValidMessage(message):
-        try:
-            return Tools.getPercentages(message) >= 5 and Tools.idGoodTime(message) and Tools.isCanceledPossible(message) and Tools.getAmout(message) > 300
+        try :   
+            return Tools.has_mexc(message) and Tools.getPercentages(message) >= 5 and Tools.idGoodTime(message) and Tools.isCanceledPossible(message) and Tools.getAmout(message) > 300
         except:
             return False
 
@@ -52,28 +56,3 @@ class Tools:
                 "amount": 40
                 }
     
-    @staticmethod
-    def getCurrentPrice(client):
-        start_time = time.time()
-        while client.last is None or 'id' in client.last:
-            if time.time() - start_time > 15:   
-                return None
-        return float(client.last['d']['deals'][0]['p'])
-    
-    @staticmethod
-    def getExpectedPrice(client, message):
-        if Tools.getDirection(message):
-            return float((Tools.getCurrentPrice(client) - Tools.getCurrentPrice(client) * Tools.getPercentages(message)/100)*1600)
-        else: 
-            return float((Tools.getCurrentPrice(client) + Tools.getCurrentPrice(client) * Tools.getPercentages(message)/100)*1600)
-
-    @staticmethod
-    def getOpeningPrice(client):
-        return float(client.first['d']['deals'][0]['p'])
-
-    @staticmethod
-    def getCurrentProfit(client, message):
-        if(Tools.getDirection(message)):
-            return float((Tools.getOpeningPrice(client)-Tools.getCurrentPrice(client))*1600)
-        else:
-            return float((Tools.getCurrentPrice(client)-Tools.getOpeningPrice(client))*1600)

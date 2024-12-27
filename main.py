@@ -3,7 +3,7 @@ import asyncio
 from telethon import TelegramClient
 from telethon import events
 import tools
-
+import re
 
 nest_asyncio.apply()
 memory = []
@@ -24,7 +24,7 @@ async def handle_new_message(event):
             await client.send_message(reciever, f"Сделка по {is_reply} была отменена. Ордер закрыт")
             return
 
-        if tools.Tools.isValidMessage(event.text):
+        if tools.Tools.isValidMessage(remove_formatting(event.text)):
             await event.forward_to(reciever)
 
             
@@ -34,6 +34,20 @@ def add_to_memmory(id, symbol):
             }
     memory.append(data)
 
+
+
+def remove_formatting(text):
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)  
+    text = re.sub(r'__(.*?)__', r'\1', text)      
+    text = re.sub(r'\*(.*?)\*', r'\1', text)     
+    text = re.sub(r'_(.*?)_', r'\1', text)        
+    text = re.sub(r'~~(.*?)~~', r'\1', text)     
+    text = re.sub(r'`(.*?)`', r'\1', text)       
+    text = re.sub(r'\[(.*?)\]\(.*?\)', r'\1', text)  
+
+    text = re.sub(r'<.*?>', '', text)  
+
+    return text
 
 def handle_reply(event):
     if event.is_reply:
