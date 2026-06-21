@@ -7,8 +7,8 @@ import re
 
 nest_asyncio.apply()
 memory = []
-API_ID = '20077498'
-API_HASH = 'b3433fe5fc1ad2135a288a42eb5aabad'
+API_ID = ''
+API_HASH = ''
 sender = -1002306843892
 reciever = -1002462696731
 
